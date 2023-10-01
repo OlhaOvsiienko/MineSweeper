@@ -1,3 +1,4 @@
+// Версия полного кода (без разбивки на 2 отдельных файла)
 const bombImage = document.createElement('img');
     bombImage.src = 'img/bomb.png';
     const flagImage = document.createElement('img');

@@ -38,11 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const inputText = playerNameInput.value.trim();
         playerName = inputText || "Anonymous"; // Если inputText пустая строка, устанавливаем "Anonymous"
         console.log(`Who is playing: ${playerName}`);
-  
-        playerResultContainer.style.display = 'none';        
-        whoIsPlaying.innerHTML = `${playerName} is playing...`; 
-        whoIsPlaying.style.display = 'block'; 
-
+        showWhoIsPlaying(playerName);
       } 
       
     });
@@ -301,6 +297,31 @@ function resetTimer() {
     timerElement.textContent = "00:00:00:00";
 }
 
+// Действия в случае победы
+function winGame(remainCells) {
+    if (remainCells === totalBombs) {
+        openAllBombs();
+        showWinMessage(playerName);
+    
+        gameOver = true;
+        updateSmile();
+        time = milliseconds + seconds * 1000 + minutes * 60 * 1000 + hours * 60 * 60 * 1000;
+        console.log(`Time in msec: ${time}`);
+    
+        console.log(`Time of the game: ${hours}:${minutes}:${seconds}:${milliseconds}`);
+        Player.addPlayer(players, playerName, time);
+        bestPlayer = Player.findBestPlayer(players);
+        console.log(`Player ${bestPlayer.playerName} has the best time: ${bestPlayer.bestTime} msec`);
+    
+        // Проверяем, улучшил ли игрок результат
+        if (time <= bestPlayer.bestTime) {
+            saveBestPlayer({ playerName, bestTime: time });
+            localStorageBestPlayer = getBestPlayer();
+            showRecordMessage(bestPlayer, playerName, localStorageBestPlayer);
+        }
+      }
+}
+
 // ***************** Результаты ************
 
 // Сообщение о рекорде
@@ -332,4 +353,27 @@ function getBestPlayer() {
     const bestPlayerJSON = localStorage.getItem('bestPlayer');
     console.log(bestPlayerJSON);
     return JSON.parse(bestPlayerJSON) || { playerName: 'Имя игрока', bestTime: Infinity };
+}
+
+// ********************* Появление / исчезновение надписей на экране **********
+function showWhoIsPlaying(playerName) {
+    playerResultContainer.style.display = 'none';        
+      whoIsPlaying.innerHTML = `${playerName} is playing...`; 
+      whoIsPlaying.style.display = 'block';
+}
+
+function showWinMessage(playerName) {
+    const messageWinDiv = document.getElementById('win-message');
+        const messageWin = `${playerName}, congratulations! You win! You found all the bombs in ${hours}:${minutes}:${seconds}:${milliseconds}`;
+        messageWinDiv.textContent = messageWin;
+        messageWinDiv.style.display = 'block'; // Сделать сообщение о победе видимым
+        whoIsPlaying.style.display = 'none';
+}
+
+function showLoseMessage(playerName) {
+    const messageLoseDiv = document.getElementById('lose-message');
+        const messageLose = `${playerName}, sorry, you lost the game!`;
+        messageLoseDiv.textContent = messageLose;
+        messageLoseDiv.style.display = 'block'; // Сделать сообщение видимым
+        whoIsPlaying.style.display = 'none';
 }

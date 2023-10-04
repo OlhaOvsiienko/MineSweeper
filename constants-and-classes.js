@@ -5,7 +5,7 @@ const flagImage = document.createElement('img');
 flagImage.src = 'img/flag.png';
 flagImage.classList.add('flag-image');
 
-// Игровое поле: размер, количество бомб, фвета цифр в ячейках возле бомб
+// Игровое поле: размер, количество бомб, цвета цифр в ячейках возле бомб
 const sizeLookup = {
   '9': {totalBombs: 5},
   '16': {totalBombs: 25},
@@ -35,6 +35,8 @@ let totalBombs = sizeLookup[currentDifficulty].totalBombs;
 const buttons = document.querySelectorAll('[id^="size-"]');
 let row = currentDifficulty;
 let col = currentDifficulty;
+
+let board = null; // Создаем пустой двухмерный массив для игрового поля
 
 // Игровые переменные
 let gameOver = false;
@@ -194,3 +196,4 @@ class Player {
         return localBestPlayer;
     }
 }
+

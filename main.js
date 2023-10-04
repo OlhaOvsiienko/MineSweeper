@@ -3,17 +3,12 @@ document.addEventListener('DOMContentLoaded', function () {
     startGame(currentDifficulty, currentDifficulty, totalBombs);  
 }); 
 
-// При первом вызове игры автоматически загружается поле уровня Easy
-document.addEventListener('DOMContentLoaded', function () {
-    startGame(currentDifficulty, currentDifficulty, totalBombs);  
-});
-
 // Обработчик клика на верхний смайл
 document.getElementById('smileBeginPlay').addEventListener('click', function() {
     startGame(currentDifficulty, currentDifficulty, totalBombs); 
 });
 
-// Обработчик события клика на каждой кнопке
+// Обработчик события клика на кнопке выбора сложности
 buttons.forEach(function(button) {
     button.addEventListener("click", function() {
         
@@ -80,7 +75,6 @@ function startGame(rows, cols, totalBombs) {
 }
 
 // Создание игрового поля
-let board = null; // Создаем пустой двухмерный массив для игрового поля
     
 function createGameBoard(rows, cols) {
     const boardContainer = document.getElementById('board');
@@ -103,10 +97,6 @@ function createGameBoard(rows, cols) {
 }
 
 // Размещение бомб на поле
-function getRandomCoordinate(size) {
-    return Math.floor(Math.random() * size);
-}
-
 function addBombs(board, totalBombs) {
     const size = board.length;
     const availableCells = [];
@@ -121,7 +111,7 @@ function addBombs(board, totalBombs) {
     // Размещаем бомбы случайным образом из доступных ячеек
     for (let i = 0; i < totalBombs; i++) {
         const randomIndex = Math.floor(Math.random() * availableCells.length);
-        const { row, col } = availableCells.splice(randomIndex, 1)[0];
+        const { row, col } = availableCells.splice(randomIndex, 1)[0]; // Удаляем из массива ячейку с бомбой, чтобы повторно там ничего не размещать
         board[row][col].hasBomb = true;
     }
 
@@ -173,8 +163,10 @@ function openCell(row, col) {
 
     cell.revealed = true;
     const clickedCell = document.querySelector(`#board tr:nth-child(${row + 1}) td:nth-child(${col + 1})`);
-
-    // Добавляем класс для подсветки открытой ячейки
+    
+    console.log('Opening cell:', row, col);
+    
+// Добавляем класс для подсветки открытой ячейки
     clickedCell.classList.add('revealed');
 
     if (cell.adjBombs === 0) {
@@ -184,16 +176,20 @@ function openCell(row, col) {
             [1, -1], [1, 0], [1, 1]
         ];
 
+        console.log(neighbors);
+
         for (const [dr, dc] of neighbors) {
             const newRow = row + dr;
             const newCol = col + dc;
+
+        console.log(`Checking neighbor at row: ${newRow}, col: ${newCol}`);
 
             if (newRow >= 0 && newRow < board.length && newCol >= 0 && newCol < board[0].length) {
                 const newCell = board[newRow][newCol];
 
                 if (!newCell.revealed) {
                     openCell(newRow, newCol); // Рекурсивный вызов для соседних ячеек
-                    
+                    console.log(`Рекурсивный вызов: ${newRow}, ${newCol}`);
                 }
             }
         }
@@ -312,7 +308,7 @@ function winGame(remainCells) {
         Player.addPlayer(players, playerName, time);
         bestPlayer = Player.findBestPlayer(players);
         console.log(`Player ${bestPlayer.playerName} has the best time: ${bestPlayer.bestTime} msec`);
-    
+
         // Проверяем, улучшил ли игрок результат
         if (time <= bestPlayer.bestTime) {
             saveBestPlayer({ playerName, bestTime: time });
@@ -355,7 +351,7 @@ function getBestPlayer() {
     return JSON.parse(bestPlayerJSON) || { playerName: 'Имя игрока', bestTime: Infinity };
 }
 
-// ********************* Появление / исчезновение надписей на экране **********
+// ********************* Появление / исчезание надписей на экране **********
 function showWhoIsPlaying(playerName) {
     playerResultContainer.style.display = 'none';        
       whoIsPlaying.innerHTML = `${playerName} is playing...`; 
@@ -377,3 +373,4 @@ function showLoseMessage(playerName) {
         messageLoseDiv.style.display = 'block'; // Сделать сообщение видимым
         whoIsPlaying.style.display = 'none';
 }
+
